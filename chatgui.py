@@ -85,14 +85,14 @@ def chatbot_response(msg):
     print("Back to chatbot_response")
     print("Res: ",res)
     if ints[0]['intent'] == 'answer':
-        response = res + " " + search(msg)
+        response = res + " " + search(msg)[0]
         return response
     return res
 
 def search(msg):
-    d, context = netguy.search(msg)
-    print(context)
-    return d
+    result = netguy.search(msg)
+    print(result)
+    return result[0]
 
 #Creating GUI with tkinter
 import tkinter
