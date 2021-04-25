@@ -11,14 +11,25 @@ def search(s):
 	res = []
 	for i in response['related_topics']:
 		try:
-			res.append(i)#['text'])
+			res.append(i)
 		except:
 			pass
 
-	return response
+	result = []
+	for i in res:
+	    try:
+	        result.append(i['text'])
+	    except:
+	        for j in i['topics']:
+	            result.append(j['text'])
 
-print(search(input()))
+	return result
+
+"""result = search(input())
+for i in result:
+	print(i)
 
 
 
 
+"""

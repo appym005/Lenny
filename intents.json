@@ -33,6 +33,21 @@
          "patterns": ["who", "What", "where", "how", "when", "lookup","is"," what is","where was","where is"],
          "responses": ["Here's what I found:"],
          "context": ["question"]
+        },
+        {"tag": "more",
+         "patterns": ["Y","y"],
+         "responses": ["more"],
+         "context": [""]
+        },
+        {"tag": "no",
+         "patterns": ["N","n"],
+         "responses": ["Hope it helped!"],
+         "context": [""]
+        },
+        {"tag": "email",
+         "patterns": ["Send mail","mail","email","send an email"],
+         "responses": ["Sending..."],
+         "context": [""]
         }
    ]
 }

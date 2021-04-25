@@ -4,6 +4,7 @@ lemmatizer = WordNetLemmatizer()
 import pickle
 import numpy as np
 import netguy
+import em
 
 from keras.models import load_model
 model = load_model('chatbot_model.h5')
@@ -16,7 +17,8 @@ print("Words: ",words)
 print("Classes: ",classes)
 
 context = ""
-
+cache = []
+cache_num = 1
 
 def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
@@ -76,6 +78,8 @@ def getResponse(ints, intents_json):
 
 def chatbot_response(msg):
     global context
+    global cache
+    global cache_num
     print("Going to predict_class")
     ints = predict_class(msg, model)
     print("Ints: ", ints)
@@ -85,21 +89,35 @@ def chatbot_response(msg):
     print("Back to chatbot_response")
     print("Res: ",res)
     if ints[0]['intent'] == 'answer':
-        response = res + " " + search(msg)[0]
+        response = res + "\n" + search(msg) + "\nmore?(y/n)"
         return response
+    if ints[0]['intent'] == 'more':
+        if cache_num < len(cache):
+            response = cache[cache_num] + "\nmore?(y/n)"
+            cache_num += 1
+        else:
+            response = 'No more results'
+            cache = []
+            cache_num = 1
+        return response
+
     return res
 
 def search(msg):
+    global cache
+    global cache_num
     result = netguy.search(msg)
     print(result)
-    return result[0]
+    cache = result
+    cache_num += 1
+    return result[cache_num - 1]
 
 #Creating GUI with tkinter
 import tkinter
 from tkinter import *
 
 
-def send():
+def send(s):
     msg = EntryBox.get("1.0",'end-1c').strip()
     EntryBox.delete("0.0",END)
 
