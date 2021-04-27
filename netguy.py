@@ -27,9 +27,8 @@ def search(s):
 
 """result = search(input())
 for i in result:
-	print(i)
+	print(i)"""
 
 
 
 
-"""

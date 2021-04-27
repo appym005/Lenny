@@ -19,7 +19,8 @@ print("Classes: ",classes)
 context = ""
 cache = []
 cache_num = 1
-
+pass_flag = 0
+info = []
 def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
     sentence_words = nltk.word_tokenize(sentence)
@@ -100,6 +101,10 @@ def chatbot_response(msg):
             cache = []
             cache_num = 1
         return response
+    if ints[0]['intent'] == 'email_info':
+        global info
+        info = msg.split('~')
+        request_password()
 
     return res
 
@@ -116,12 +121,24 @@ def search(msg):
 import tkinter
 from tkinter import *
 
+def request_password():
+    msg = 'Enter password:\n\n'
+    ChatLog.config(state=NORMAL)
+    ChatLog.insert(END, msg)
+    ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+    ChatLog.config(state=DISABLED)
+    ChatLog.yview(END)
+    EntryBox.config(show='*')
+    global pass_flag
+    pass_flag = 1
+    
 
 def send(s):
-    msg = EntryBox.get("1.0",'end-1c').strip()
-    EntryBox.delete("0.0",END)
+    global pass_flag
+    msg = EntryBox.get().strip() #"1.0",'end-1c'
+    EntryBox.delete(0,END)
 
-    if msg != '':
+    if msg != '' and not pass_flag:
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, "You: " + msg + '\n\n')
         ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
@@ -131,7 +148,22 @@ def send(s):
             
         ChatLog.config(state=DISABLED)
         ChatLog.yview(END)
- 
+    else:
+        m = {}
+        m['receiver'] = info[0]
+        m['sender'] = info[1]
+        m['password'] = msg
+        m['subject'] = info[2]
+        m['body'] = info[3]
+        res = em.mailer(m)
+        ChatLog.config(state=NORMAL)
+        ChatLog.insert(END, "Bot: " + res + '\n\n')
+        ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
+        ChatLog.config(state=DISABLED)
+        ChatLog.yview(END)
+        pass_flag = 0
+        EntryBox.config(show="")
+    
 
 base = Tk()
 base.title("Hello")
@@ -153,7 +185,7 @@ SendButton = Button(base, font=("Verdana",12,'bold'), text="Send", width="12", h
                     command= send )
 
 #Create the box to enter message
-EntryBox = Text(base, bd=0, bg="white",width="29", height="5", font="Arial")
+EntryBox = Entry(base, bd=0, bg="white",width="29", font="Arial")
 EntryBox.bind("<Return>", send)
 
 

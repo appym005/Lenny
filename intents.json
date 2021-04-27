@@ -46,6 +46,11 @@
         },
         {"tag": "email",
          "patterns": ["Send mail","mail","email","send an email"],
+         "responses": ["Please use the format: receiver mail~sender mail~subject~body. \n For example:\n rec@gmail.com~send@gmail.com~This is the subject~This is the body"],
+         "context": [""]
+        },
+        {"tag": "email_info",
+         "patterns": ["rec@gmail.com~send@gmail.com~This is the subject~This is the body","rec@gmail.com~send@gmail.com","rec@yahoo.com~send@yahoo.com","rec@gmail.com~send@gmail.com~Hello how are you~Hope you are well"],
          "responses": ["Sending..."],
          "context": [""]
         }
