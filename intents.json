@@ -30,7 +30,7 @@
          "context": [""]
         },
         {"tag": "answer",
-         "patterns": ["who", "What", "where", "how", "when", "lookup","is"," what is","where was","where is"],
+         "patterns": ["who", "What", "where", "how", "when", "lookup","is"," what is","where was","where is","search","look in notes"],
          "responses": ["Here's what I found:"],
          "context": ["question"]
         },
@@ -52,6 +52,21 @@
         {"tag": "email_info",
          "patterns": ["rec@gmail.com~send@gmail.com~This is the subject~This is the body","rec@gmail.com~send@gmail.com","rec@yahoo.com~send@yahoo.com","rec@gmail.com~send@gmail.com~Hello how are you~Hope you are well"],
          "responses": ["Sending..."],
+         "context": [""]
+        },
+        {"tag": "note",
+         "patterns": ["Take note","make a note","note","write a note"],
+         "responses": ["Noting..."],
+         "context": [""]
+        },
+        {"tag": "note_search",
+         "patterns": ["search","look in notes","find in notes","search in notes","lookup in notes","look up in notes"],
+         "responses": ["What to look for?"],
+         "context": ["question"]
+        },
+        {"tag": "get_all",
+         "patterns": ["get_all", "show all notes","i want to see all notes"],
+         "responses": ["here"],
          "context": [""]
         }
    ]

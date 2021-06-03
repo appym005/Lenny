@@ -5,8 +5,9 @@ import pickle
 import numpy as np
 import netguy
 import em
+import note
 
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 model = load_model('chatbot_model.h5')
 import json
 import random
@@ -18,7 +19,7 @@ print("Classes: ",classes)
 
 context = ""
 cache = []
-cache_num = 1
+cache_num = 0
 pass_flag = 0
 info = []
 def clean_up_sentence(sentence):
@@ -99,23 +100,35 @@ def chatbot_response(msg):
         else:
             response = 'No more results'
             cache = []
-            cache_num = 1
+            cache_num = 0
         return response
     if ints[0]['intent'] == 'email_info':
         global info
         info = msg.split('~')
         request_password()
+    if ints[0]['intent'] == 'note':
+        request_note()
+    if ints[0]['intent'] == 'note_search':
+        note_search()
+    if ints[0]['intent'] == 'get_all':
+        response = note.get_all()
+        return response
 
     return res
+
 
 def search(msg):
     global cache
     global cache_num
+    cache_num = 0
     result = netguy.search(msg)
     print(result)
     cache = result
     cache_num += 1
-    return result[cache_num - 1]
+    try:
+        return result[cache_num - 1]
+    except:
+        return 'No results :('
 
 #Creating GUI with tkinter
 import tkinter
@@ -131,6 +144,29 @@ def request_password():
     EntryBox.config(show='*')
     global pass_flag
     pass_flag = 1
+
+def request_note():
+    msg = 'Noting...\n\n'
+    ChatLog.config(state=NORMAL)
+    ChatLog.insert(END, msg)
+    ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+    ChatLog.config(state=DISABLED)
+    ChatLog.yview(END)
+    EntryBox.config(show="")
+    global pass_flag
+    pass_flag = 2
+
+def note_search():
+    msg = 'What to look for?\n\n'
+    ChatLog.config(state=NORMAL)
+    ChatLog.insert(END, msg)
+    ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+    ChatLog.config(state=DISABLED)
+    ChatLog.yview(END)
+    EntryBox.config(show="")
+    global pass_flag, cache_num
+    pass_flag = 3
+    cache_num = 0
     
 
 def send(s):
@@ -149,20 +185,48 @@ def send(s):
         ChatLog.config(state=DISABLED)
         ChatLog.yview(END)
     else:
-        m = {}
-        m['receiver'] = info[0]
-        m['sender'] = info[1]
-        m['password'] = msg
-        m['subject'] = info[2]
-        m['body'] = info[3]
-        res = em.mailer(m)
-        ChatLog.config(state=NORMAL)
-        ChatLog.insert(END, "Bot: " + res + '\n\n')
-        ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
-        ChatLog.config(state=DISABLED)
-        ChatLog.yview(END)
-        pass_flag = 0
-        EntryBox.config(show="")
+        if pass_flag == 1:
+            m = {}
+            m['receiver'] = info[0]
+            m['sender'] = info[1]
+            m['password'] = msg
+            m['subject'] = info[2]
+            m['body'] = info[3]
+            res = em.mailer(m)
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + res + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            pass_flag = 0
+            EntryBox.config(show="")
+        elif pass_flag == 2:
+            res = note.noter(msg)
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + res + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            pass_flag = 0
+            EntryBox.config(show="")
+        elif pass_flag == 3:
+            global cache
+            global cache_num
+            result = note.note_searcher(msg)
+            print(result)
+            cache = result
+            cache_num += 1
+            if result[0] == 'Nothing Found':
+                res = result[0]
+            else:
+                res = "Here's what I found:\n" + result[cache_num - 1] + "\nmore?(y/n)"
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + res + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            pass_flag = 0
+            EntryBox.config(show="")
     
 
 base = Tk()
