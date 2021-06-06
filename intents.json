@@ -21,7 +21,7 @@
         },
         {"tag": "options",
          "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
-         "responses": ["I can lookup answers to your questions on the internet."],
+         "responses": ["Here's a list of things I can do: \n Talk to you\n Search for a term\n Send an email\n Make notes"],
          "context": [""]
         },
         {"tag": "surprise",
@@ -55,7 +55,7 @@
          "context": [""]
         },
         {"tag": "note",
-         "patterns": ["Take note","make a note","note","write a note"],
+         "patterns": ["Take note","make a note","write a note"],
          "responses": ["Noting..."],
          "context": [""]
         },
@@ -67,6 +67,11 @@
         {"tag": "get_all",
          "patterns": ["get_all", "show all notes","i want to see all notes"],
          "responses": ["here"],
+         "context": [""]
+        },
+        {"tag": "delete_note",
+         "patterns": ["delete note", "delete a note","i want to delete a note"],
+         "responses": ["Deleted"],
          "context": [""]
         }
    ]

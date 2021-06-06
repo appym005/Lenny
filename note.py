@@ -20,9 +20,9 @@ def note_searcher(st):
 
 	v = list(s.values())
 	r = []
-	for i in v:
-		if st in i:
-			r.append(i)
+	for i in range(1,len(v)):
+		if st in v[i]:
+			r.append((i,v[i]))
 
 	if r:
 		return r
@@ -34,12 +34,34 @@ def get_all():
 		s = json.load(handle)
 
 	v = list(s.values())
-	a = """"""
-	for i in v:
-		a += i 
+	k = list(s.keys())
+	a = """\n"""
+	for i in range(1,len(v)):
+		a += k[i] + ': ' + v[i] 
 		a += '\n\n'
 	return a
+
+def delete(n):
+	with open('notes.json', 'r') as handle:
+		s = json.load(handle)
+
+	if n > len(s):
+		return 'Not found'
+			
+	for i in range(n, len(s) - 1):
+		s[str(i)] = s[str(i+1)]
+
+	s.popitem()
+
+	with open('notes.json', 'w') as handle:
+		json.dump(s, handle, indent=4)
+
+	return 'Deleted'
+
+
 
 #print(note_searcher('test'))
 
 #print(get_all())
+
+#print(delete(8))

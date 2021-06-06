@@ -95,7 +95,7 @@ def chatbot_response(msg):
         return response
     if ints[0]['intent'] == 'more':
         if cache_num < len(cache):
-            response = cache[cache_num] + "\nmore?(y/n)"
+            response = str(cache[cache_num][0]) + ': ' + cache[cache_num][1] + "\nmore?(y/n)"
             cache_num += 1
         else:
             response = 'No more results'
@@ -113,6 +113,8 @@ def chatbot_response(msg):
     if ints[0]['intent'] == 'get_all':
         response = note.get_all()
         return response
+    if ints[0]['intent'] == 'delete_note':
+        delete()
 
     return res
 
@@ -159,13 +161,25 @@ def request_note():
 def note_search():
     msg = 'What to look for?\n\n'
     ChatLog.config(state=NORMAL)
-    ChatLog.insert(END, msg)
+    ChatLog.insert(END, "Bot: " + msg + '\n\n')
     ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
     ChatLog.config(state=DISABLED)
     ChatLog.yview(END)
     EntryBox.config(show="")
     global pass_flag, cache_num
     pass_flag = 3
+    cache_num = 0
+
+def delete():
+    msg = 'Note number to delete?\n\n'
+    ChatLog.config(state=NORMAL)
+    ChatLog.insert(END, "Bot: " + msg + '\n\n')
+    ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+    ChatLog.config(state=DISABLED)
+    ChatLog.yview(END)
+    EntryBox.config(show="")
+    global pass_flag, cache_num
+    pass_flag = 4
     cache_num = 0
     
 
@@ -219,9 +233,22 @@ def send(s):
             if result[0] == 'Nothing Found':
                 res = result[0]
             else:
-                res = "Here's what I found:\n" + result[cache_num - 1] + "\nmore?(y/n)"
+                res = "Here's what I found:\n" + str(result[cache_num - 1][0]) + ': ' + result[cache_num - 1][1] + "\nmore?(y/n)"
             ChatLog.config(state=NORMAL)
             ChatLog.insert(END, "Bot: " + res + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            pass_flag = 0
+            EntryBox.config(show="")
+        elif pass_flag == 4:
+            ChatLog.config(state=NORMAL)
+            result = note.delete(int(msg))
+            ChatLog.insert(END, "You: " + msg + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            print(result)
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + result + '\n\n')
             ChatLog.config(foreground="#442265", font=("Verdana", 12 ))    
             ChatLog.config(state=DISABLED)
             ChatLog.yview(END)
