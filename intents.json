@@ -73,6 +73,26 @@
          "patterns": ["delete note", "delete a note","i want to delete a note"],
          "responses": ["Deleted"],
          "context": [""]
+        },
+        {"tag": "create user",
+         "patterns": ["create a new user"],
+         "responses": ["create_user"],
+         "context": [""]
+        },
+        {"tag": "hide file",
+         "patterns": ["hide a file"],
+         "responses": ["hide_file"],
+         "context": [""]
+        },
+        {"tag": "show file",
+         "patterns": ["find a file"],
+         "responses": ["get_file"],
+         "context": [""]
+        },
+        {"tag": "show all files",
+         "patterns": ["Show all files"],
+         "responses": ["get_all"],
+         "context": [""]
         }
    ]
 }

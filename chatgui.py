@@ -6,6 +6,7 @@ import numpy as np
 import netguy
 import em
 import note
+import file_handler
 
 from tensorflow.keras.models import load_model
 model = load_model('chatbot_model.h5')
@@ -22,6 +23,12 @@ cache = []
 cache_num = 0
 pass_flag = 0
 info = []
+user = ''
+pasd = ''
+action = ''
+path = ''
+filename = ''
+
 def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
     sentence_words = nltk.word_tokenize(sentence)
@@ -82,6 +89,7 @@ def chatbot_response(msg):
     global context
     global cache
     global cache_num
+    global action
     print("Going to predict_class")
     ints = predict_class(msg, model)
     print("Ints: ", ints)
@@ -115,6 +123,17 @@ def chatbot_response(msg):
         return response
     if ints[0]['intent'] == 'delete_note':
         delete()
+    if ints[0]['intent'] == 'create user':
+        action = 1
+        request_username()
+    elif ints[0]['intent'] == 'hide file':
+        action = 2
+        request_username()
+    elif ints[0]['intent'] == 'show file':
+        action = 3
+        request_username()
+
+
 
     return res
 
@@ -181,10 +200,22 @@ def delete():
     global pass_flag, cache_num
     pass_flag = 4
     cache_num = 0
+
+def request_username():
+    global pass_flag
+    ChatLog.config(state=NORMAL)
+    ChatLog.insert(END, "Bot: Enter Username: " + '\n')
+    ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+    ChatLog.config(state=DISABLED)
+    ChatLog.yview(END)
+    EntryBox.config(show="")
+    pass_flag = 5
+
     
 
 def send(s):
     global pass_flag
+    global user, pasd, path, filename
     msg = EntryBox.get().strip() #"1.0",'end-1c'
     EntryBox.delete(0,END)
 
@@ -254,6 +285,79 @@ def send(s):
             ChatLog.yview(END)
             pass_flag = 0
             EntryBox.config(show="")
+        elif pass_flag == 5:
+            user = msg
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "You: " + msg + '\n\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: Enter password: " + '\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            EntryBox.config(show="*")
+            pass_flag = 6
+        elif pass_flag == 6: 
+            pasd = msg
+            res = 'Not an action'
+            if action == 1:
+                res = file_handler.create_user(user, pasd)
+                ChatLog.config(state=NORMAL)
+                ChatLog.insert(END, "Bot: " + res + '\n')
+                ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+                ChatLog.config(state=DISABLED)
+                ChatLog.yview(END)
+                EntryBox.config(show="")
+                pass_flag = 0
+            elif action == 2:
+                ChatLog.config(state=NORMAL)
+                ChatLog.insert(END, "Bot: " + 'Enter path of file to hide' + '\n')
+                ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+                ChatLog.config(state=DISABLED)
+                ChatLog.yview(END)
+                EntryBox.config(show="")
+                pass_flag = 7
+            elif action == 3:
+                ChatLog.config(state=NORMAL)
+                ChatLog.insert(END, "Bot: " + 'Enter filename of hidden file' + '\n')
+                ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+                ChatLog.config(state=DISABLED)
+                ChatLog.yview(END)
+                EntryBox.config(show="")
+                pass_flag = 9
+        elif pass_flag == 7:
+            path = msg
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + 'Enter filename of hidden file' + '\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            EntryBox.config(show="")
+            pass_flag = 8
+        elif pass_flag == 8:
+            filename = msg
+            res = file_handler.hide_file(user, pasd, path, filename)
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + res + '\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            EntryBox.config(show="")
+            pass_flag = 0
+            path  = ''
+            filename = ''
+        elif pass_flag == 9:
+            filename = msg
+            res = file_handler.get_file(user, pasd, filename)
+            ChatLog.config(state=NORMAL)
+            ChatLog.insert(END, "Bot: " + res + '\n')
+            ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+            ChatLog.config(state=DISABLED)
+            ChatLog.yview(END)
+            EntryBox.config(show="")
+            pass_flag = 0
+            path  = ''
+            filename = ''
     
 
 base = Tk()
