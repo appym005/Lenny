@@ -46,11 +46,28 @@ def get_file(user, pasd, filename):
 	else:
 		return auth(user, pasd)
 
+def get_all_file(user, pasd):
+	if auth(user, pasd) == True:
+		with open('hiden/files', 'r') as f:
+			s = json.load(f)
+
+		res = ''
+		f = 1
+		for i in s.keys():
+			if f:
+				f = 0
+			else:
+				res += i + '\n'
+		return res
+	else:
+		return 'Authentication failed'
+		
 
 if __name__ == "__main__":
 	run = True
 	user = input('User?')
 	pasd = input('Pasd?')
+	print(get_all_file(user, pasd))
 	while run:
 		
 		c = int(input('Action?'))

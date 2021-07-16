@@ -7,6 +7,7 @@ import netguy
 import em
 import note
 import file_handler
+import executor
 
 from tensorflow.keras.models import load_model
 model = load_model('chatbot_model.h5')
@@ -99,7 +100,7 @@ def chatbot_response(msg):
     print("Back to chatbot_response")
     print("Res: ",res)
     if ints[0]['intent'] == 'answer':
-        response = res + "\n" + search(msg) + "\nmore?(y/n)"
+        response = res + "\n" + search(msg)[1] + "\nmore?(y/n)"
         return response
     if ints[0]['intent'] == 'more':
         if cache_num < len(cache):
@@ -132,6 +133,9 @@ def chatbot_response(msg):
     elif ints[0]['intent'] == 'show file':
         action = 3
         request_username()
+    elif ints[0]['intent'] == 'show all files':
+        action = 4
+        request_username()
 
 
 
@@ -146,9 +150,9 @@ def search(msg):
     print(result)
     cache = result
     cache_num += 1
-    try:
+    if len(result) != 0:
         return result[cache_num - 1]
-    except:
+    else:
         return 'No results :('
 
 #Creating GUI with tkinter
@@ -223,8 +227,11 @@ def send(s):
         ChatLog.config(state=NORMAL)
         ChatLog.insert(END, "You: " + msg + '\n\n')
         ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
-    
-        res = chatbot_response(msg)
+
+        if msg[0] == '>':
+            res = executor.execute(msg[1:])
+        else:
+            res = chatbot_response(msg)
         ChatLog.insert(END, "Bot: " + res + '\n\n')
             
         ChatLog.config(state=DISABLED)
@@ -325,6 +332,14 @@ def send(s):
                 ChatLog.yview(END)
                 EntryBox.config(show="")
                 pass_flag = 9
+            elif action == 4:
+                ChatLog.config(state=NORMAL)
+                ChatLog.insert(END, 'Hidden:\n' + file_handler.get_all_file(user,pasd) + '\n')
+                ChatLog.config(foreground="#442265", font=("Verdana", 12 ))
+                ChatLog.config(state=DISABLED)
+                ChatLog.yview(END)
+                EntryBox.config(show="")
+                pass_flag = 0
         elif pass_flag == 7:
             path = msg
             ChatLog.config(state=NORMAL)
@@ -362,7 +377,7 @@ def send(s):
 
 base = Tk()
 base.title("Hello")
-base.geometry("400x500")
+base.geometry("1080x720")
 base.resizable(width=FALSE, height=FALSE)
 
 #Create Chat window
@@ -385,9 +400,9 @@ EntryBox.bind("<Return>", send)
 
 
 #Place all components on the screen
-scrollbar.place(x=376,y=6, height=386)
-ChatLog.place(x=6,y=6, height=386, width=370)
-EntryBox.place(x=128, y=401, height=90, width=265)
-SendButton.place(x=6, y=401, height=90)
+scrollbar.place(x=1068,y=6, height=605)
+ChatLog.place(x=6,y=6, height=605, width=1060)
+EntryBox.place(x=128, y=620, height=90, width=950)
+SendButton.place(x=6, y=620, height=90)
 
 base.mainloop()

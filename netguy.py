@@ -17,18 +17,22 @@ def search(s):
 
 	result = []
 	for i in res:
-	    try:
-	        result.append(i['text'])
-	    except:
-	        for j in i['topics']:
-	            result.append(j['text'])
+		try:
+			result.append(i['text'])
+		except:
+			for j in i['topics']:
+				result.append(j['text'])
 
-	return result
 
+	res = []
+	for i in range(0,len(result)):
+		res.append((i+1,result[i]))
+
+	return res
 """result = search(input())
 for i in result:
 	print(i)"""
 
 
-
+#search('fungi')
 
