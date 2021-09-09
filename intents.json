@@ -21,7 +21,7 @@
         },
         {"tag": "options",
          "patterns": ["How you could help me?", "What you can do?", "What help you provide?", "How you can be helpful?", "What support is offered"],
-         "responses": ["Here are some of things I can do: \n Talk to you\n Search for a term\n Send an email\n Make notes"],
+         "responses": ["Here are some of things I can do: \n Talk to you\n Search for a term\n Send an email\n Make notes\n Hide Files\n Execute Commands"],
          "context": [""]
         },
         {"tag": "surprise",
